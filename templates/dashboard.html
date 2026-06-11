@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="metric-grid" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="metric-value" style="color:{% if bu_ay_kar >= 0 %}var(--success){% else %}var(--accent){% endif %};">
+      ₺{{ "%.0f"|format(bu_ay_kar) }}
+    </div>
+    <div class="metric-label">{{ t('metric_kar') }}</div>
+    {% if gecen_ay_ciro > 0 %}
+    <div class="metric-trend" style="color:{% if bu_ay_ciro >= gecen_ay_ciro %}var(--success){% else %}var(--accent){% endif %};">
+      {% if bu_ay_ciro >= gecen_ay_ciro %}↑{% else %}↓{% endif %}
+      {{ t('gecen_aya_gore') }}
+    </div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <div class="metric-value">₺{{ "%.0f"|format(bu_ay_ciro) }}</div>
+    <div class="metric-label">{{ t('metric_ciro') }}</div>
+    <div class="metric-trend neutral">→ {{ t('gecen_ay') }} ₺{{ "%.0f"|format(gecen_ay_ciro) }}</div>
+  </div>
+  <div class="card">
+    <div class="metric-value">%{{ fire_oran }}</div>
+    <div class="metric-label">{{ t('metric_fire') }}</div>
+  </div>
+  <div class="card">
+    <div class="metric-value" style="color:{% if bekleyen_borc > 0 %}var(--warning){% else %}var(--success){% endif %};">
+      ₺{{ "%.0f"|format(toplam_borc) }}
+    </div>
+    <div class="metric-label">{{ t('metric_borc') }}</div>
+    {% if bekleyen_borc > 0 %}
+    <div class="metric-trend" style="color:var(--warning);">{{ bekleyen_borc }} {{ t('musteri_gecikmis') }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="col-2">
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_top_urunler') }}</div>
+    {% for u in top_urunler %}
+    <div class="data-row">
+      <span class="data-label">{{ u.ad }}</span>
+      <span class="data-value">₺{{ "%.0f"|format(u.toplam) }}</span>
+    </div>
+    {% else %}
+    <div class="body-sm">{{ t('label_veri_yok') }}</div>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_musteri_karlilik') }}</div>
+    {% for m in musteri_kar %}
+    <div class="data-row">
+      <span class="data-label">{{ m.ad }}</span>
+      <span class="data-value {% if m.marj and m.marj >= 20 %}good{% else %}warn{% endif %}">
+        ₺{{ "%.0f"|format(m.alis) }} · %{{ m.marj }} {{ t('marj') }}
+      </span>
+    </div>
+    {% else %}
+    <div class="body-sm">{{ t('label_veri_yok') }}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

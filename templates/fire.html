@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-2" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_fire_kaydi') }}</div>
+    <form hx-post="/fire" hx-target="this" hx-swap="outerHTML" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="input-group">
+        <label>Ürün</label>
+        <select name="urun_id" class="input-field" required>
+          {% for u in urunler %}
+          <option value="{{ u.id }}">{{ u.ad }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Fire türü</label>
+        <select name="fire_turu" class="input-field">
+          <option value="uretim">Üretim fire</option>
+          <option value="bayat">Bayat fire</option>
+          <option value="dagitim">Dağıtım fire</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Miktar</label>
+        <input type="number" name="miktar" class="input-field" step="0.5" min="0" required placeholder="0">
+      </div>
+      <button type="submit" class="btn btn-primary" style="align-self:flex-start;">{{ t('btn_kaydet') }}</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_son_fire') }}</div>
+    {% for k in kayitlar %}
+    <div class="data-row">
+      <span class="data-label">{{ k.tarih }} · {{ k.urun_ad }} · {{ k.fire_turu }}</span>
+      <span class="data-value bad">{{ k.miktar }} adet</span>
+    </div>
+    {% else %}
+    <div class="body-sm">{{ t('label_veri_yok') }}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-2" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_yeni_musteri') }}</div>
+    <form hx-post="/musteriler" hx-target="this" hx-swap="outerHTML" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="input-group">
+        <label>Ad</label>
+        <input type="text" name="ad" class="input-field" required placeholder="Müşteri adı">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="input-group">
+          <label>Telefon</label>
+          <input type="text" name="telefon" class="input-field" placeholder="05XX XXX XX XX">
+        </div>
+        <div class="input-group">
+          <label>Tür</label>
+          <select name="tur" class="input-field">
+            <option value="perakende">Perakende</option>
+            <option value="toptan">Toptan</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="align-self:flex-start;">{{ t('btn_ekle') }}</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('nav_customers') }}</div>
+    {% for m in musteriler %}
+    <div class="data-row">
+      <div>
+        <div class="data-label">{{ m.ad }}</div>
+        <div style="font-size:11px;color:var(--text-disabled);font-family:'Space Mono';">{{ m.tur }} · {{ m.telefon }}</div>
+      </div>
+      <div class="text-right">
+        <div class="data-value">₺{{ "%.0f"|format(m.bu_ay_alis) }}</div>
+        <div style="font-size:10px;font-family:'Space Mono';color:{% if m.marj and m.marj >= 20 %}var(--success){% else %}var(--warning){% endif %};">
+          %{{ m.marj }} {{ t('marj') }}
+          {% if m.borc > 0 %} · ₺{{ "%.0f"|format(m.borc) }} {{ t('borc') }}{% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="body-sm">{{ t('label_veri_yok') }}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

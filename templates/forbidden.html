@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-1" style="max-width:400px;margin:48px auto;text-align:center;">
+  <div class="icon-large" style="margin-bottom:16px;">
+    <svg width="48" height="48" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="1.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  </div>
+  <div class="label" style="margin-bottom:8px;">{{ t('forbidden_title') }}</div>
+  <div class="body-sm" style="color:var(--text-secondary);margin-bottom:24px;">{{ t('forbidden_text') }}</div>
+  <a href="/" class="btn btn-primary">{{ t('nav_dashboard') }}</a>
+</div>
+{% endblock %}

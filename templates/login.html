@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+<div style="max-width:360px;margin:48px auto;">
+  <div class="card">
+    <div class="heading" style="margin-bottom:24px;">{{ t('login_title') }}</div>
+    <form method="POST" action="/giris">
+      <div class="input-group" style="margin-bottom:16px;">
+        <label>{{ t('login_username') }}</label>
+        <input type="text" name="username" class="input-field" required autofocus>
+      </div>
+      <div class="input-group" style="margin-bottom:24px;">
+        <label>{{ t('login_pin') }}</label>
+        <input type="password" name="pin" class="input-field" required maxlength="4" pattern="[0-9]{4}" inputmode="numeric">
+      </div>
+      {% if hata %}
+      <div class="body-sm" style="color:var(--accent);margin-bottom:16px;">{{ hata }}</div>
+      {% endif %}
+      <button type="submit" class="btn btn-primary" style="width:100%;">{{ t('btn_giris') }}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

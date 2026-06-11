@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-2" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_yeni_gider') }}</div>
+    <form hx-post="/gider" hx-target="this" hx-swap="outerHTML" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="input-group">
+        <label>Kategori</label>
+        <select name="kategori_id" class="input-field" required>
+          {% for k in kategoriler %}
+          <option value="{{ k.id }}">{{ k.ad }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Tutar (₺)</label>
+        <input type="number" name="tutar" class="input-field" step="0.01" min="0" required placeholder="0.00">
+      </div>
+      <div class="input-group">
+        <label>Açıklama</label>
+        <input type="text" name="aciklama" class="input-field" placeholder="İsteğe bağlı">
+      </div>
+      <button type="submit" class="btn btn-primary" style="align-self:flex-start;">{{ t('btn_kaydet') }}</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="metric-value" style="font-size:28px;margin-bottom:16px;">₺{{ "%.0f"|format(toplam) }}</div>
+    <div class="metric-label">{{ t('metric_ciro') }}</div>
+    <div style="margin-top:20px;">
+      {% for g in giderler %}
+      <div class="data-row">
+        <span class="data-label">{{ g.kategori_ad }}</span>
+        <span class="data-value">₺{{ "%.0f"|format(g.tutar) }}</span>
+      </div>
+      {% else %}
+      <div class="body-sm">{{ t('label_veri_yok') }}</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

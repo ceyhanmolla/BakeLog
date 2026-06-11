@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card" style="margin-bottom:24px;">
+  <div class="label" style="margin-bottom:16px;">{{ t('label_yeni_kategori') }}</div>
+  <form method="POST" action="/kategoriler" hx-post="/kategoriler" hx-target="body" hx-swap="outerHTML">
+    <input type="hidden" name="id" id="edit-id">
+    <div class="query-filters" style="grid-template-columns:1fr auto;">
+      <div class="input-group">
+        <label>{{ t('kategori_ad') }}</label>
+        <input type="text" name="ad" class="input-field" required autofocus>
+      </div>
+      <div class="input-group" style="justify-content:flex-end;">
+        <button type="submit" class="btn btn-primary" style="margin-top:auto;">{{ t('btn_kaydet') }}</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <div class="label" style="margin-bottom:12px;">{{ t('label_kategori_liste') }}</div>
+  {% if kategoriler %}
+  <div style="overflow-x:auto;">
+    <table class="query-table">
+      <thead>
+        <tr>
+          <th>{{ t('kategori_ad') }}</th>
+          <th>{{ t('kategori_durum') }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for k in kategoriler %}
+        <tr>
+          <td>{{ k.ad }}</td>
+          <td>{% if k.is_active %}{{ t('kategori_aktif') }}{% else %}<span style="color:var(--text-disabled);">{{ t('kategori_pasif') }}</span>{% endif %}</td>
+          <td style="text-align:right;">
+            {% if k.is_active %}
+            <button class="btn btn-secondary" style="padding:4px 10px;min-height:32px;font-size:9px;"
+              onclick="editCat({{ k.id }}, '{{ k.ad }}')">{{ t('btn_duzenle') }}</button>
+            <button class="btn btn-secondary" style="padding:4px 10px;min-height:32px;font-size:9px;color:var(--accent);"
+              hx-post="/kategoriler/sil/{{ k.id }}" hx-target="body" hx-swap="outerHTML"
+              onclick="return confirm('{{ t('kategori_sil_onay') }}')">{{ t('btn_sil') }}</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="body" style="color:var(--text-secondary);">{{ t('label_veri_yok') }}</div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function editCat(id, ad) {
+  document.getElementById('edit-id').value = id;
+  document.querySelector('[name=ad]').value = ad;
+  document.querySelector('[name=ad]').focus();
+}
+</script>
+{% endblock %}

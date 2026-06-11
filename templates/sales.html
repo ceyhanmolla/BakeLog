@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-2" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_yeni_satis') }}</div>
+    <form hx-post="/satis" hx-target="this" hx-swap="outerHTML" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="input-group">
+        <label>{{ t('nav_customers') }}</label>
+        <select name="musteri_id" class="input-field" required>
+          {% for m in musteriler %}
+          <option value="{{ m.id }}">{{ m.ad }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Ürün</label>
+        <select name="urun_id" class="input-field" required>
+          {% for u in urunler %}
+          <option value="{{ u.id }}">{{ u.ad }} — ₺{{ "%.0f"|format(u.birim_fiyat) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="input-group">
+          <label>Miktar</label>
+          <input type="number" name="miktar" class="input-field" value="1" min="0.5" step="0.5" required>
+        </div>
+        <div class="input-group">
+          <label>Ödeme</label>
+          <select name="odeme_turu" class="input-field">
+            <option value="nakit">Nakit</option>
+            <option value="kart">Kart</option>
+            <option value="veresiye">Veresiye</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="align-self:flex-start;">{{ t('btn_kaydet') }}</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_son_satislar') }}</div>
+    {% for s in satislar %}
+    <div class="data-row">
+      <span class="data-label">{{ s.musteri_ad }} · {{ s.urun_ad }}</span>
+      <span class="data-value">₺{{ "%.0f"|format(s.toplam) }}</span>
+    </div>
+    {% else %}
+    <div class="body-sm">{{ t('label_veri_yok') }}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% if not hx_request %}{% extends "layout.html" %}{% endif %}
+{% block content %}
+
+<div id="query-content">
+<div hx-indicator="#time-indicator">
+  <div id="time-indicator" class="htmx-indicator" style="text-align:center;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-secondary);letter-spacing:0.08em;padding:4px 0;text-transform:uppercase;min-height:20px;"></div>
+  <div style="display:flex;justify-content:center;margin-bottom:32px;">
+    <div class="time-selector">
+      <button hx-post="/sorgu" hx-target="#query-content" hx-swap="outerHTML" hx-vals='{"zaman":"bugun"}' class="time-btn{% if overview.zaman == 'bugun' %} active{% endif %}">{{ t('overview_bugun') }}</button>
+      <button hx-post="/sorgu" hx-target="#query-content" hx-swap="outerHTML" hx-vals='{"zaman":"hafta"}' class="time-btn{% if overview.zaman == 'hafta' %} active{% endif %}">{{ t('overview_hafta') }}</button>
+      <button hx-post="/sorgu" hx-target="#query-content" hx-swap="outerHTML" hx-vals='{"zaman":"ay"}' class="time-btn{% if overview.zaman == 'ay' %} active{% endif %}">{{ t('overview_ay') }}</button>
+    </div>
+  </div>
+</div>
+
+<div class="metric-grid htmx-fade-in">
+  <div class="card-sm" style="display:flex;flex-direction:column;gap:6px;">
+    <div class="metric-label">{{ t('query_ciro') }}</div>
+    <div class="metric-value">{{ "%.0f"|format(overview.ciro) }} <span class="metric-unit">₺</span></div>
+    {% if overview.ciro_trend == 'up' %}
+    <div class="metric-trend" style="color:var(--success);">↑</div>
+    {% elif overview.ciro_trend == 'down' %}
+    <div class="metric-trend" style="color:var(--accent);">↓</div>
+    {% endif %}
+  </div>
+  <div class="card-sm" style="display:flex;flex-direction:column;gap:6px;">
+    <div class="metric-label">{{ t('query_giderler') }}</div>
+    <div class="metric-value">{{ "%.0f"|format(overview.gider) }} <span class="metric-unit">₺</span></div>
+  </div>
+  <div class="card-sm" style="display:flex;flex-direction:column;gap:6px;">
+    <div class="metric-label">{{ t('query_kar_zarar') }}</div>
+    <div class="metric-value"{% if overview.kar < 0 %} style="color:var(--accent);"{% endif %}>{{ "%.0f"|format(overview.kar) }} <span class="metric-unit">₺</span></div>
+    {% if overview.kar_trend == 'up' %}
+    <div class="metric-trend" style="color:var(--success);">↑</div>
+    {% elif overview.kar_trend == 'down' %}
+    <div class="metric-trend" style="color:var(--accent);">↓</div>
+    {% endif %}
+  </div>
+  <div class="card-sm" style="display:flex;flex-direction:column;gap:6px;">
+    <div class="metric-label">{{ t('query_fire_orani') }}</div>
+    <div class="metric-value"{% if overview.fire|float > 10 %} style="color:var(--accent);"{% elif overview.fire|float > 5 %} style="color:var(--warning);"{% endif %}>{{ overview.fire }}<span class="metric-unit">%</span></div>
+  </div>
+  <div class="card-sm" style="display:flex;flex-direction:column;gap:6px;">
+    <div class="metric-label">{{ t('query_en_cok_satan') }}</div>
+    <div class="metric-value" style="font-size:28px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ overview.pop_urun }}</div>
+    <div class="body-sm">{{ "%.0f"|format(overview.pop_urun_t) }} ₺</div>
+  </div>
+  <div class="card-sm" style="display:flex;flex-direction:column;gap:6px;">
+    <div class="metric-label">{{ t('query_borclar') }}</div>
+    <div class="metric-value"{% if overview.borc|float > 0 %} style="color:var(--warning);"{% endif %}>{{ "%.0f"|format(overview.borc) }} <span class="metric-unit">₺</span></div>
+  </div>
+  <div class="card-sm" style="display:flex;flex-direction:column;gap:6px;">
+    <div class="metric-label">{{ t('query_un_kullanim') }}</div>
+    <div class="metric-value">{{ "%.1f"|format(overview.un) }} <span class="metric-unit">kg</span></div>
+  </div>
+</div>
+
+<form method="POST" action="/sorgu" id="query-form">
+  <input type="hidden" name="query_type" id="query_type" value="{{ aktif_sorgu or 'kar_zarar' }}">
+  <input type="hidden" name="zaman" value="{{ overview.zaman }}">
+
+  <div style="text-align:center;margin:24px 0;">
+    <button type="button" class="btn btn-secondary" id="detail-toggle"
+      onclick="var s=document.getElementById('detail-section');s.classList.toggle('hidden');this.textContent=s.classList.contains('hidden')?'{{ t('overview_detay') }}':'{{ t('overview_gizle') }}'">{{ t('overview_detay') }}</button>
+  </div>
+
+  <div class="hidden" id="detail-section">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="query-filters">
+        <div class="input-group">
+          <label>{{ t('filter_baslangic') }}</label>
+          <input type="date" name="baslangic" class="input-field" value="{{ baslangic }}">
+        </div>
+        <div class="input-group">
+          <label>{{ t('filter_bitis') }}</label>
+          <input type="date" name="bitis" class="input-field" value="{{ bitis }}">
+        </div>
+        <div class="input-group">
+          <label>{{ t('filter_urun') }}</label>
+          <select name="urun_id" class="input-field">
+            <option value="">{{ t('filter_urun_sec') }}</option>
+            {% for u in urunler %}
+            <option value="{{ u.id }}" {% if urun_id == u.id|string %}selected{% endif %}>{{ u.ad }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="input-group">
+          <label>{{ t('filter_musteri') }}</label>
+          <select name="musteri_id" class="input-field">
+            <option value="">{{ t('filter_musteri_sec') }}</option>
+            {% for m in musteriler %}
+            <option value="{{ m.id }}" {% if musteri_id == m.id|string %}selected{% endif %}>{{ m.ad }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="query-presets">
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'kar_zarar' %} active{% endif %}" data-query="kar_zarar">{{ t('query_kar_zarar') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'ciro' %} active{% endif %}" data-query="ciro">{{ t('query_ciro') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'giderler' %} active{% endif %}" data-query="giderler">{{ t('query_giderler') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'un_kullanim' %} active{% endif %}" data-query="un_kullanim">{{ t('query_un_kullanim') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'fire_orani' %} active{% endif %}" data-query="fire_orani">{{ t('query_fire_orani') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'en_cok_satan' %} active{% endif %}" data-query="en_cok_satan">{{ t('query_en_cok_satan') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'musteri_siralamasi' %} active{% endif %}" data-query="musteri_siralamasi">{{ t('query_musteri_siralamasi') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'borclar' %} active{% endif %}" data-query="borclar">{{ t('query_borclar') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'gunluk_satislar' %} active{% endif %}" data-query="gunluk_satislar">{{ t('query_gunluk_satislar') }}</button>
+        <button type="button" class="btn btn-secondary query-btn{% if aktif_sorgu == 'gecen_ay_karsilastirma' %} active{% endif %}" data-query="gecen_ay_karsilastirma">{{ t('query_gecen_ay') }}</button>
+      </div>
+      <div style="margin-top:16px;">
+        <button type="submit" class="btn btn-primary">{{ t('btn_sorgula') }}</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+{% if sonuc is not none %}
+<div class="card" style="overflow-x:auto;margin-top:24px;">
+  <div class="label" style="margin-bottom:12px;">{{ t('query_sonuc') }}{% if aktif_sorgu %} — <span class="caption" style="text-transform:none;letter-spacing:0;">{{ t('query_' + aktif_sorgu) }}</span>{% endif %}</div>
+  {% if sonuc.rows and sonuc.rows|length > 0 %}
+  <table class="query-table">
+    <thead>
+      <tr>{% for col in sonuc.columns[0] %}<th>{{ col }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for row in sonuc.rows %}
+      <tr{% if row[0] == 'TOPLAM' %} class="query-total"{% endif %}>
+        {% for val in row %}<td>{{ val }}</td>{% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="body" style="color:var(--text-secondary);">{{ t('query_sonuc_yok') }}</div>
+  {% endif %}
+</div>
+{% endif %}
+
+<script>
+document.querySelectorAll('.query-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.query-btn').forEach(function(b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById('query_type').value = this.dataset.query;
+    document.getElementById('query-form').requestSubmit();
+  });
+});
+</script>
+</div>
+{% endblock %}

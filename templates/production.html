@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-2" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_yeni_uretim') }}</div>
+    <form hx-post="/uretim" hx-target="this" hx-swap="outerHTML" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="input-group">
+        <label>Ürün</label>
+        <select name="urun_id" class="input-field" required>
+          {% for u in urunler %}
+          <option value="{{ u.id }}">{{ u.ad }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="input-group">
+          <label>Üretilen miktar</label>
+          <input type="number" name="uretilen_miktar" class="input-field" step="0.5" min="0" required placeholder="0">
+        </div>
+        <div class="input-group">
+          <label>Kullanılan un (kg)</label>
+          <input type="number" name="kullanilan_un_kg" class="input-field" step="0.1" min="0" placeholder="0">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Notlar</label>
+        <input type="text" name="notlar" class="input-field" placeholder="Opsiyonel">
+      </div>
+      <button type="submit" class="btn btn-primary" style="align-self:flex-start;">{{ t('btn_kaydet') }}</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="label" style="margin-bottom:16px;">{{ t('label_son_uretimler') }}</div>
+    {% for k in kayitlar %}
+    <div class="data-row">
+      <span class="data-label">{{ k.tarih }} · {{ k.urun_ad }}</span>
+      <span class="data-value">{{ k.uretilen_miktar }} adet</span>
+    </div>
+    {% else %}
+    <div class="body-sm">{{ t('label_veri_yok') }}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

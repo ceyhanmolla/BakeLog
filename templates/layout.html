@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default('tr') }}" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ t('app_title') }}{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <button class="hamburger" onclick="toggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="/" class="header-logo">
+        <svg class="logo-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="16" height="12" rx="2"/>
+          <line x1="2" y1="9" x2="18" y2="9"/>
+          <path d="M7 13h6"/>
+        </svg>
+        <span class="header-title">{{ t('app_title') }}</span>
+      </a>
+      <div class="header-right">
+        {% if session.user_id %}
+        <span class="caption" style="white-space:nowrap;">{{ session.username }}{% if session.role != 'patron' %} ({{ session.role }}){% endif %}</span>
+        <a href="/cikis" class="btn-ghost" style="padding:6px;font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary);">{{ t('btn_cikis') }}</a>
+        {% endif %}
+        <select id="lang-select" onchange="switchLang(this.value)" class="input-field" style="border:none;font-size:11px;letter-spacing:1px;padding:4px;width:auto;">
+          <option value="tr" {% if lang == 'tr' %}selected{% endif %}>TR</option>
+          <option value="en" {% if lang == 'en' %}selected{% endif %}>EN</option>
+          <option value="de" {% if lang == 'de' %}selected{% endif %}>DE</option>
+        </select>
+        <button onclick="toggleTheme()" class="btn-ghost" style="padding:8px;" aria-label="{{ t('app_title') }}">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <nav class="nav-bar nav-desktop" id="main-nav">
+      {% if 'dashboard' in allowed_pages %}<a href="/" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">{{ t('nav_dashboard') }}</a>{% endif %}
+      {% if 'sales' in allowed_pages %}<a href="/satis" class="nav-item {% if active_page == 'sales' %}active{% endif %}">{{ t('nav_sales') }}</a>{% endif %}
+      {% if 'expenses' in allowed_pages %}<a href="/gider" class="nav-item {% if active_page == 'expenses' %}active{% endif %}">{{ t('nav_expenses') }}</a>{% endif %}
+      {% if 'production' in allowed_pages %}<a href="/uretim" class="nav-item {% if active_page == 'production' %}active{% endif %}">{{ t('nav_production') }}</a>{% endif %}
+      {% if 'customers' in allowed_pages %}<a href="/musteriler" class="nav-item {% if active_page == 'customers' %}active{% endif %}">{{ t('nav_customers') }}</a>{% endif %}
+      {% if 'products' in allowed_pages %}<a href="/urunler" class="nav-item {% if active_page == 'products' %}active{% endif %}">{{ t('nav_products') }}</a>{% endif %}
+      {% if 'categories' in allowed_pages %}<a href="/kategoriler" class="nav-item {% if active_page == 'categories' %}active{% endif %}">{{ t('nav_categories') }}</a>{% endif %}
+      {% if 'fire' in allowed_pages %}<a href="/fire" class="nav-item {% if active_page == 'fire' %}active{% endif %}">{{ t('nav_fire') }}</a>{% endif %}
+      {% if 'query' in allowed_pages %}<a href="/sorgu" class="nav-item {% if active_page == 'query' %}active{% endif %}">{{ t('nav_query') }}</a>{% endif %}
+    </nav>
+
+    <main style="padding:24px 0;">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+
+    function switchLang(code) {
+      const url = new URL(window.location);
+      url.searchParams.set('lang', code);
+      window.location = url.toString();
+    }
+
+    function toggleNav() {
+      document.getElementById('main-nav').classList.toggle('open');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
