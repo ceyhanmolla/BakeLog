@@ -30,25 +30,79 @@ TR / EN / DE dil destegi.
 
 ## Kurulum
 
+### Gereksinimler
+
+- Python 3.9 veya uzeri (yoksa [python.org](https://www.python.org/downloads/) adresinden indirin)
+- Git (yoksa [git-scm.com](https://git-scm.com/downloads) adresinden indirin)
+
+### Adim Adim
+
+**1. Repoyu bilgisayariniza indirin**
+
+Terminal (macOS) veya Komut Istemi'nde (Windows) su komutu calistirin:
+
 ```bash
 git clone https://github.com/ceyhanmolla/BakeLog.git
 cd BakeLog
+```
+
+**2. Sanal ortam olusturun (opsiyonel ama onerilir)**
+
+```bash
 python3 -m venv .venv
+```
+
+#### macOS / Linux
+
+```bash
 source .venv/bin/activate
+```
+
+#### Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+Aktif oldugunda terminalde `(.venv)` yazisi gorunur.
+
+**3. Bagimliliklari yukleyin**
+
+```bash
 pip install -r requirements.txt
+```
+
+**4. Ortam degiskenlerini ayarlayin**
+
+```bash
 cp .env.example .env
+```
+
+**.env** dosyasini bir metin editoruyle acip `SECRET_KEY` degerini degistirebilirsiniz. Varsayilan haliyle de calisir.
+
+**5. Uygulamayi baslatin**
+
+```bash
 python3 app.py
 ```
 
-Tarayicida `http://localhost:5001` acilir.
+**6. Tarayicinizda acin**
+
+```
+http://localhost:5001
+```
+
+### Giris Yapma
 
 Seed kullanicilar (tumunun PIN'i `0000`):
 
-| Rol | Kullanici |
-|-----|-----------|
-| Patron | `patron` |
-| Kasiyer | `kasiyer` |
-| Usta | `usta` |
+| Rol | Kullanici Adi | PIN |
+|-----|---------------|-----|
+| Patron | `patron` | `0000` |
+| Kasiyer | `kasiyer` | `0000` |
+| Usta | `usta` | `0000` |
+
+**Not:** Ilk calistirmada `veritabani.db` otomatik olusur ve ornek verilerle dolar. Dilerseniz `models.py` icindeki `seed_data()` fonksiyonunu duzenleyerek kendi verilerinizle baslayabilirsiniz.
 
 ## Roller
 
